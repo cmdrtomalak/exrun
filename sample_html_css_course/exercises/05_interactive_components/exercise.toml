@@ -1,0 +1,16 @@
+[exercise]
+name = "Interactive Components"
+order = 5
+difficulty = "advanced"
+
+[test]
+timeout_seconds = 30
+
+[hints]
+enabled = true
+hints = [
+    "Use CSS transitions for smooth property changes",
+    "Add CSS animations for keyframe-based movement",
+    "Implement hover effects with :hover pseudo-class",
+    "Use transform properties for scale, rotate, translate effects"
+]

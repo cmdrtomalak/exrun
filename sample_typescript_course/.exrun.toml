@@ -1,0 +1,6 @@
+[project]
+exercises_path = "."
+
+[defaults]
+language = "typescript"
+test_runner = "vitest"

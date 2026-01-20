@@ -1,0 +1,223 @@
+/* Interactive Components - Add your CSS below */
+
+/* TODO: Add CSS custom properties for animations */
+:root {
+    /* Define animation durations and timing functions */
+    --transition-fast: 0.2s;
+    --transition-normal: 0.3s;
+    --transition-slow: 0.5s;
+    --ease-out: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* TODO: Create smooth transitions for buttons and links */
+.cta-button {
+    /* Add base button styles */
+    transition: all var(--transition-normal) var(--ease-out);
+}
+
+.cta-button:hover {
+    /* Add hover effects with transform */
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
+
+.project-link {
+    /* Add link transition effects */
+    transition: color var(--transition-fast) ease;
+}
+
+/* TODO: Create animations */
+@keyframes fadeInUp {
+    /* Create fade-in-up animation */
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    /* Create pulse animation */
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+@keyframes spin {
+    /* Create spinning animation */
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* TODO: Apply animations to elements */
+.animated-content {
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.animated-title {
+    animation: fadeInUp 1s ease-out 0.2s both;
+}
+
+.animated-subtitle {
+    animation: fadeInUp 1.2s ease-out 0.4s both;
+}
+
+.loading-spinner {
+    /* Add spinning loader animation */
+    animation: spin 1s linear infinite;
+}
+
+/* TODO: Create interactive card hover effects */
+.interactive-card {
+    transition: transform var(--transition-normal) ease;
+}
+
+.interactive-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+}
+
+.card-image {
+    position: relative;
+    overflow: hidden;
+}
+
+.card-overlay {
+    /* Add overlay transition */
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity var(--transition-normal) ease;
+}
+
+.interactive-card:hover .card-overlay {
+    opacity: 1;
+}
+
+/* TODO: Create navigation link hover effects */
+.nav-link {
+    position: relative;
+    transition: color var(--transition-fast) ease;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: currentColor;
+    transition: width var(--transition-normal) ease;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+/* TODO: Create skill bar animations */
+.skill-progress {
+    height: 100%;
+    background: linear-gradient(90deg, #007bff, #0056b3);
+    border-radius: 4px;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 1s ease;
+}
+
+/* TODO: Create form input animations */
+.form-group {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 4px;
+    transition: border-color var(--transition-fast) ease, box-shadow var(--transition-fast) ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
+}
+
+.form-label {
+    position: absolute;
+    left: 0.75rem;
+    top: 0.75rem;
+    color: #666;
+    transition: all var(--transition-fast) ease;
+    pointer-events: none;
+}
+
+.form-input:focus + .form-label,
+.form-input:not(:placeholder-shown) + .form-label {
+    top: -0.5rem;
+    left: 0.5rem;
+    font-size: 0.75rem;
+    background: white;
+    padding: 0 0.25rem;
+}
+
+/* TODO: Create submit button loading state */
+.submit-btn {
+    position: relative;
+    overflow: hidden;
+    transition: all var(--transition-normal) ease;
+}
+
+.btn-loader {
+    display: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid transparent;
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.submit-btn.loading .btn-text {
+    display: none;
+}
+
+.submit-btn.loading .btn-loader {
+    display: block;
+}
+
+/* TODO: Add responsive considerations for animations */
+@media (prefers-reduced-motion: reduce) {
+    /* Respect user's motion preferences */
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* TODO: Add hover effects for logo */
+.animated-logo:hover {
+    animation: pulse 2s infinite;
+}

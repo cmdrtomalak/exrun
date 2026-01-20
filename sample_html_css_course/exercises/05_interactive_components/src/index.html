@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Portfolio</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Interactive Navigation -->
+        <header class="header">
+            <div class="logo animated-logo">Portfolio</div>
+            <nav class="nav">
+                <ul class="nav-list">
+                    <li><a href="#home" class="nav-link">Home</a></li>
+                    <li><a href="#about" class="nav-link">About</a></li>
+                    <li><a href="#projects" class="nav-link">Projects</a></li>
+                    <li><a href="#contact" class="nav-link">Contact</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- Hero Section with Animation -->
+        <section class="hero">
+            <div class="hero-content animated-content">
+                <h1 class="animated-title">Welcome to My Interactive Portfolio</h1>
+                <p class="animated-subtitle">I create engaging, animated web experiences</p>
+                <a href="#projects" class="cta-button">Explore My Work</a>
+            </div>
+            <div class="loading-spinner"></div>
+        </section>
+
+        <!-- Interactive Project Cards -->
+        <section class="projects">
+            <h2>Interactive Projects</h2>
+            <div class="project-grid">
+                <article class="project-card interactive-card">
+                    <div class="card-image">
+                        <img src="https://picsum.photos/seed/interactive1/400/300.jpg" alt="Interactive Project 1">
+                        <div class="card-overlay">
+                            <h3>Hover to See Effect</h3>
+                            <p>This card has interactive hover effects</p>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <h3>Interactive Dashboard</h3>
+                        <p>Animated charts and real-time data visualization with smooth transitions.</p>
+                        <a href="#" class="project-link interactive-link">View Project →</a>
+                    </div>
+                </article>
+
+                <article class="project-card interactive-card">
+                    <div class="card-image">
+                        <img src="https://picsum.photos/seed/interactive2/400/300.jpg" alt="Interactive Project 2">
+                        <div class="card-overlay">
+                            <h3>Smooth Animations</h3>
+                            <p>CSS animations and transitions throughout</p>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <h3>Animated Gallery</h3>
+                        <p>Image gallery with zoom effects and smooth transition animations.</p>
+                        <a href="#" class="project-link interactive-link">View Project →</a>
+                    </div>
+                </article>
+
+                <article class="project-card interactive-card">
+                    <div class="card-image">
+                        <img src="https://picsum.photos/seed/interactive3/400/300.jpg" alt="Interactive Project 3">
+                        <div class="card-overlay">
+                            <h3>Micro-interactions</h3>
+                            <p>Small details that enhance user experience</p>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <h3>Interactive Form</h3>
+                        <p>Form with animated inputs, validation, and submission effects.</p>
+                        <a href="#" class="project-link interactive-link">View Project →</a>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- Interactive Skills Section -->
+        <section class="skills">
+            <h2>Interactive Skills</h2>
+            <div class="skills-container">
+                <div class="skill-item">
+                    <div class="skill-bar">
+                        <div class="skill-progress" data-skill="90%">
+                            <span class="skill-label">HTML/CSS</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-bar">
+                        <div class="skill-progress" data-skill="85%">
+                            <span class="skill-label">JavaScript</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="skill-item">
+                    <div class="skill-bar">
+                        <div class="skill-progress" data-skill="75%">
+                            <span class="skill-label">React</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Interactive Contact Form -->
+        <section class="contact">
+            <h2>Get In Touch</h2>
+            <form class="contact-form interactive-form">
+                <div class="form-group">
+                    <input type="text" placeholder="Your Name" class="form-input" required>
+                    <label class="form-label">Name</label>
+                </div>
+                <div class="form-group">
+                    <input type="email" placeholder="Your Email" class="form-input" required>
+                    <label class="form-label">Email</label>
+                </div>
+                <div class="form-group">
+                    <textarea placeholder="Your Message" class="form-input" rows="5" required></textarea>
+                    <label class="form-label">Message</label>
+                </div>
+                <button type="submit" class="submit-btn">
+                    <span class="btn-text">Send Message</span>
+                    <div class="btn-loader"></div>
+                </button>
+            </form>
+        </section>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2024 Your Name. Interactive Web Developer.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+[project]
+exercises_path = "."
+
+[defaults]
+language = "pytorch"
+test_runner = "pytest"

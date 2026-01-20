@@ -1,0 +1,15 @@
+[exercise]
+name = "Tensor Basics"
+order = 1
+difficulty = "beginner"
+
+[test]
+timeout_seconds = 30
+
+[hints]
+enabled = true
+hints = [
+    "Use torch.tensor() to create a tensor from a Python list",
+    "Use torch.zeros() and torch.ones() to create tensors filled with zeros or ones",
+    "The shape parameter should be a tuple like (2, 3) for a 2x3 tensor"
+]

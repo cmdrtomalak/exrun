@@ -1,0 +1,16 @@
+[exercise]
+name = "CSS Fundamentals"
+order = 2
+difficulty = "beginner"
+
+[test]
+timeout_seconds = 30
+
+[hints]
+enabled = true
+hints = [
+    "Use CSS selectors like element selectors, class selectors, and ID selectors",
+    "Apply colors with color and background-color properties",
+    "Use CSS properties for typography: font-family, font-size, font-weight",
+    "Apply the box model: margin, padding, border"
+]

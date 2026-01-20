@@ -1,0 +1,16 @@
+[exercise]
+name = "Training Loop"
+order = 5
+difficulty = "intermediate"
+
+[test]
+timeout_seconds = 60
+
+[hints]
+enabled = true
+hints = [
+    "Use nn.CrossEntropyLoss() for classification tasks",
+    "Use torch.optim.SGD(model.parameters(), lr=...) to create an optimizer",
+    "The training step pattern: optimizer.zero_grad() -> loss.backward() -> optimizer.step()",
+    "Remember to call model.train() before training and model.eval() before evaluation"
+]

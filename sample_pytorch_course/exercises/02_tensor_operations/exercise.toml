@@ -1,0 +1,15 @@
+[exercise]
+name = "Tensor Operations"
+order = 2
+difficulty = "beginner"
+
+[test]
+timeout_seconds = 30
+
+[hints]
+enabled = true
+hints = [
+    "Basic arithmetic operators (+, -, *, /) work element-wise on tensors",
+    "Use torch.matmul() or the @ operator for matrix multiplication",
+    "Use tensor.reshape() or tensor.view() to change tensor shape"
+]

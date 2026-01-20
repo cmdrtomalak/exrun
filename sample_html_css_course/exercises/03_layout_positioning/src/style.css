@@ -1,0 +1,59 @@
+/* Layout & Positioning - Add your CSS below */
+
+/* TODO: Create overall page layout with CSS Grid */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    /* Add grid layout here */
+}
+
+/* TODO: Style fixed navigation with Flexbox */
+.navbar {
+    /* Add flexbox styling */
+    position: fixed; /* Fixed positioning */
+    top: 0;
+    width: 100%;
+}
+
+/* TODO: Create main content grid layout */
+.main-grid {
+    /* Add grid layout for main content */
+    display: grid;
+    /* Define grid areas and columns */
+}
+
+/* TODO: Style sidebar and content areas */
+.sidebar {
+    /* Add sidebar styling */
+}
+
+.content {
+    /* Add main content styling */
+}
+
+/* TODO: Create responsive project grid */
+.project-grid {
+    /* Add grid layout for project cards */
+}
+
+/* TODO: Style project cards with Flexbox */
+.project-card {
+    /* Add flexbox styling for card content */
+    display: flex;
+    flex-direction: column;
+}
+
+/* TODO: Style tech stack tags with Flexbox */
+.tech-stack {
+    /* Add flexbox for tag layout */
+}
+
+/* TODO: Add footer styling */
+.site-footer {
+    /* Add footer styling */
+}
+
+/* TODO: Add responsive layout adjustments */
+@media (max-width: 768px) {
+    /* Add responsive styles */
+}

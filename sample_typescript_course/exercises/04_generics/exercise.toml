@@ -1,0 +1,15 @@
+[exercise]
+name = "Generics"
+order = 4
+difficulty = "intermediate"
+
+[test]
+timeout_seconds = 30
+
+[hints]
+enabled = true
+hints = [
+    "Generics use angle brackets: function identity<T>(value: T): T",
+    "You can have multiple type parameters: function pair<A, B>(a: A, b: B)",
+    "Constrain generics with extends: function getLength<T extends { length: number }>(item: T)"
+]

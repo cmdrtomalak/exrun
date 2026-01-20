@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- TODO: Add viewport meta tag here -->
+    <title>Responsive Portfolio</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Responsive Navigation -->
+        <header class="header">
+            <div class="logo">Portfolio</div>
+            <nav class="nav">
+                <ul class="nav-list">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#projects">Projects</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+                <!-- TODO: Add mobile menu button -->
+                <button class="mobile-menu-btn">☰</button>
+            </nav>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Welcome to My Portfolio</h1>
+                <p>I create responsive, modern web experiences</p>
+                <a href="#projects" class="cta-button">View My Work</a>
+            </div>
+        </section>
+
+        <!-- Projects Grid -->
+        <section class="projects">
+            <h2>Featured Projects</h2>
+            <div class="project-grid">
+                <article class="project-card">
+                    <img src="https://picsum.photos/seed/project1/400/300.jpg" alt="Project 1">
+                    <h3>Responsive Website</h3>
+                    <p>A fully responsive business website with mobile-first design.</p>
+                    <a href="#" class="project-link">View Project →</a>
+                </article>
+
+                <article class="project-card">
+                    <img src="https://picsum.photos/seed/project2/400/300.jpg" alt="Project 2">
+                    <h3>Web Application</h3>
+                    <p>Interactive dashboard with responsive charts and data visualization.</p>
+                    <a href="#" class="project-link">View Project →</a>
+                </article>
+
+                <article class="project-card">
+                    <img src="https://picsum.photos/seed/project3/400/300.jpg" alt="Project 3">
+                    <h3>E-commerce Platform</h3>
+                    <p>Modern online store with responsive product galleries.</p>
+                    <a href="#" class="project-link">View Project →</a>
+                </article>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="contact">
+            <h2>Get In Touch</h2>
+            <div class="contact-content">
+                <div class="contact-info">
+                    <h3>Contact Information</h3>
+                    <p>📧 your@email.com</p>
+                    <p>📱 (555) 123-4567</p>
+                    <p>📍 San Francisco, CA</p>
+                </div>
+                <div class="contact-form">
+                    <h3>Send Message</h3>
+                    <form>
+                        <input type="text" placeholder="Your Name" required>
+                        <input type="email" placeholder="Your Email" required>
+                        <textarea placeholder="Your Message" rows="5" required></textarea>
+                        <button type="submit">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2024 Your Name. Responsive Web Developer.</p>
+    </footer>
+</body>
+</html>

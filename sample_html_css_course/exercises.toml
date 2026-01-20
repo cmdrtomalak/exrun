@@ -1,0 +1,9 @@
+[course]
+name = "Learn HTML & CSS"
+version = "1.0.0"
+language = "html_css"
+test_runner = "npm run test"
+
+[settings]
+show_hints = true
+max_attempts_before_hint = 3

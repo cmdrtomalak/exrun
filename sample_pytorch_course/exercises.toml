@@ -1,0 +1,9 @@
+[course]
+name = "Learn PyTorch"
+version = "1.0.0"
+language = "pytorch"
+test_runner = "pytest"
+
+[settings]
+show_hints = true
+max_attempts_before_hint = 3

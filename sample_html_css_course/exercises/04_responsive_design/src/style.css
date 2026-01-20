@@ -1,0 +1,125 @@
+/* Responsive Design - Mobile-first approach */
+
+/* TODO: Add CSS custom properties for consistent theming */
+:root {
+    /* Define your color palette and spacing here */
+}
+
+/* TODO: Mobile-first base styles (default) */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    /* Add mobile-friendly base styles */
+}
+
+.container {
+    /* Add container styles for mobile */
+    padding: 0 1rem;
+}
+
+/* TODO: Responsive header */
+.header {
+    /* Add mobile header styles */
+}
+
+.nav {
+    /* Add mobile navigation styles */
+}
+
+.nav-list {
+    /* Hide by default on mobile */
+    display: none;
+}
+
+.mobile-menu-btn {
+    /* Show only on mobile */
+    display: block;
+}
+
+/* TODO: Responsive hero section */
+.hero {
+    /* Add mobile hero styles */
+}
+
+.hero-content {
+    /* Add mobile hero content styles */
+}
+
+/* TODO: Responsive project grid */
+.project-grid {
+    /* Add mobile project grid (single column) */
+}
+
+.project-card {
+    /* Add mobile project card styles */
+}
+
+/* TODO: Responsive contact section */
+.contact-content {
+    /* Stack contact info and form on mobile */
+}
+
+.contact-form {
+    /* Add mobile form styles */
+}
+
+/* TODO: Tablet styles */
+@media (min-width: 768px) {
+    /* Add tablet-specific styles here */
+    .container {
+        max-width: 768px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+    
+    /* Show desktop navigation */
+    .nav-list {
+        display: flex;
+    }
+    
+    .mobile-menu-btn {
+        display: none;
+    }
+    
+    /* Update project grid for tablet */
+    .project-grid {
+        /* Two columns on tablet */
+    }
+    
+    /* Side-by-side contact section */
+    .contact-content {
+        /* Side by side layout */
+    }
+}
+
+/* TODO: Desktop styles */
+@media (min-width: 1024px) {
+    /* Add desktop-specific styles here */
+    .container {
+        max-width: 1024px;
+    }
+    
+    /* Three-column project grid on desktop */
+    .project-grid {
+        /* Three columns on desktop */
+    }
+    
+    /* Larger typography and spacing */
+    h1 {
+        font-size: 3rem;
+    }
+}
+
+/* TODO: Large desktop styles */
+@media (min-width: 1200px) {
+    /* Add large desktop styles here */
+    .container {
+        max-width: 1200px;
+    }
+}
