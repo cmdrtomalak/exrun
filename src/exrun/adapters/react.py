@@ -40,7 +40,7 @@ class ReactAdapter(TestAdapter):
             if not install_result.passed:
                 return install_result
 
-        cmd = exercise.config.test_command or self.get_default_command(exercise)
+        cmd = self.get_default_command(exercise)
 
         start = time.time()
         try:

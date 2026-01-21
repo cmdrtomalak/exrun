@@ -63,13 +63,30 @@ def load_course_config(config_path: Path) -> CourseConfig:
 
 
 def _extract_order_from_name(name: str) -> int:
-    """Extract order number from exercise directory name like '01_variables'.
+    """Extract order number from exercise directory name.
+
+    Supports patterns like:
+    - '01_variables' -> 1
+    - 'ex01_hello' -> 1
+    - 'exercise_01_intro' -> 1
 
     Returns 999 if no numeric prefix found.
     """
+    # Try numeric prefix first: 01_variables
     match = re.match(r"^(\d+)", name)
     if match:
         return int(match.group(1))
+
+    # Try ex/exercise prefix: ex01_hello, exercise01_intro
+    match = re.match(r"^(?:ex|exercise)[-_]?(\d+)", name, re.IGNORECASE)
+    if match:
+        return int(match.group(1))
+
+    # Try finding first number in the name
+    match = re.search(r"(\d+)", name)
+    if match:
+        return int(match.group(1))
+
     return 999
 
 
@@ -134,10 +151,30 @@ def load_exercise(
 
 
 def _is_exercise_dir(path: Path) -> bool:
-    """Check if a directory is an exercise (has src/ or tests/)."""
-    return path.is_dir() and (
-        (path / "src").exists() or (path / "tests").exists()
-    )
+    """Check if a directory is an exercise.
+
+    An exercise directory is detected if it has:
+    - src/ subdirectory, or
+    - tests/ subdirectory, or
+    - test_*.py files (for flat structure), or
+    - solution.py file (for flat structure)
+    """
+    if not path.is_dir():
+        return False
+
+    # Check for standard structure
+    if (path / "src").exists() or (path / "tests").exists():
+        return True
+
+    # Check for flat structure with test files
+    if any(path.glob("test_*.py")):
+        return True
+
+    # Check for solution.py pattern
+    if (path / "solution.py").exists():
+        return True
+
+    return False
 
 
 def _discover_exercises_recursive(
@@ -192,23 +229,12 @@ def discover_exercises(exercises_path: Path, course_config: CourseConfig) -> lis
 
 def detect_language(exercise: Exercise, course_config: CourseConfig) -> str:
     """Detect the language for an exercise."""
-    if exercise.config.test_command:
-        cmd = exercise.config.test_command.lower()
-        if "pytest" in cmd:
-            if _has_torch_imports(exercise.src_path):
-                return "pytorch"
-            return "python"
-        elif "vitest" in cmd or "jest" in cmd:
-            if _has_react_imports(exercise.src_path) or course_config.language == "react":
-                return "react"
-            return "typescript" if _has_ts_files(exercise.src_path) else "javascript"
-        elif "playwright" in cmd:
-            return "html_css"
-
     if course_config.language in ("react", "pytorch"):
         return course_config.language
 
-    src_path = exercise.src_path
+    # Check src/ directory first, then exercise directory for flat structure
+    src_path = exercise.src_path if exercise.src_path.exists() else exercise.path
+
     if src_path.exists():
         extensions = {f.suffix for f in src_path.rglob("*") if f.is_file()}
         if ".jsx" in extensions or (".tsx" in extensions and _has_react_imports(src_path)):

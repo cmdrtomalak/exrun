@@ -20,7 +20,7 @@ class HtmlCssAdapter(TestAdapter):
         return f"npx playwright test {exercise.tests_path} --reporter=list"
 
     def run_tests(self, exercise: Exercise, timeout: int = 30) -> TestResult:
-        cmd = exercise.config.test_command or self.get_default_command(exercise)
+        cmd = self.get_default_command(exercise)
 
         start = time.time()
         try:

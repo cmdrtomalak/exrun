@@ -16,10 +16,14 @@ class PythonAdapter(TestAdapter):
         return "Python (pytest)"
 
     def get_default_command(self, exercise: Exercise) -> str:
-        return f"pytest {exercise.tests_path} -v --tb=short"
+        # Check for tests/ subdirectory first
+        if exercise.tests_path.exists():
+            return f"pytest {exercise.tests_path} -v --tb=short"
+        # Otherwise run pytest in the exercise directory (flat structure)
+        return "pytest -v --tb=short"
 
     def run_tests(self, exercise: Exercise, timeout: int = 30) -> TestResult:
-        cmd = exercise.config.test_command or self.get_default_command(exercise)
+        cmd = self.get_default_command(exercise)
 
         start = time.time()
         try:
@@ -61,7 +65,11 @@ class PythonAdapter(TestAdapter):
         import os
 
         env = os.environ.copy()
-        pythonpath = str(exercise.src_path)
+        # Add src/ to PYTHONPATH if it exists, otherwise add the exercise dir
+        if exercise.src_path.exists():
+            pythonpath = str(exercise.src_path)
+        else:
+            pythonpath = str(exercise.path)
         if "PYTHONPATH" in env:
             pythonpath = f"{pythonpath}:{env['PYTHONPATH']}"
         env["PYTHONPATH"] = pythonpath
