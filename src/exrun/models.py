@@ -1,6 +1,6 @@
 """Data models for exercise runner."""
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 
@@ -40,12 +40,8 @@ class TestResult:
 @dataclass
 class ExerciseConfig:
     name: str
-    order: int
-    difficulty: str = "beginner"
-    test_command: str | None = None
+    order: tuple[int, ...]  # Hierarchical ordering, e.g., (1, 2) for exercises/01_*/02_*
     timeout_seconds: int = 30
-    hints: list[str] = field(default_factory=list)
-    hints_enabled: bool = True
 
 
 @dataclass
@@ -59,8 +55,13 @@ class Exercise:
         return self.config.name
 
     @property
-    def order(self) -> int:
+    def order(self) -> tuple[int, ...]:
         return self.config.order
+
+    @property
+    def order_str(self) -> str:
+        """String representation of order for display."""
+        return ".".join(str(o) for o in self.config.order)
 
     @property
     def src_path(self) -> Path:
@@ -73,16 +74,11 @@ class Exercise:
 
 @dataclass
 class CourseConfig:
+    """Configuration from exrun.toml."""
+
     name: str
+    exercises_path: Path
     version: str = "1.0.0"
     language: str = "python"
     test_runner: str = "pytest"
-    show_hints: bool = True
-    max_attempts_before_hint: int = 3
-
-
-@dataclass
-class ProjectConfig:
-    exercises_path: Path
-    default_language: str = "python"
-    default_test_runner: str = "pytest"
+    timeout_seconds: int = 30

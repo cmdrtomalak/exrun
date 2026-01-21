@@ -1,6 +1,0 @@
-[project]
-exercises_path = "."
-
-[defaults]
-language = "react"
-test_runner = "vitest"

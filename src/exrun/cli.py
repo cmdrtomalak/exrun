@@ -266,9 +266,9 @@ def init(
     course_path = path or Path.cwd()
     course_path.mkdir(parents=True, exist_ok=True)
 
-    exercises_toml = course_path / "exercises.toml"
-    if exercises_toml.exists():
-        console.print(f"[yellow]exercises.toml already exists at {course_path}[/yellow]")
+    exrun_toml = course_path / "exrun.toml"
+    if exrun_toml.exists():
+        console.print(f"[yellow]exrun.toml already exists at {course_path}[/yellow]")
         raise typer.Exit(1)
 
     test_runner = {
@@ -280,15 +280,13 @@ def init(
         "html_css": "playwright",
     }.get(language, "pytest")
 
-    exercises_toml.write_text(f'''[course]
+    # Write the minimal exrun.toml configuration file
+    exrun_toml.write_text(f'''[course]
 name = "{name}"
 version = "1.0.0"
 language = "{language}"
 test_runner = "{test_runner}"
-
-[settings]
-show_hints = true
-max_attempts_before_hint = 3
+exercises_path = "./exercises"
 ''')
 
     exercises_dir = course_path / "exercises"
@@ -298,19 +296,6 @@ max_attempts_before_hint = 3
     ex1_dir.mkdir(exist_ok=True)
     (ex1_dir / "src").mkdir(exist_ok=True)
     (ex1_dir / "tests").mkdir(exist_ok=True)
-
-    (ex1_dir / "exercise.toml").write_text('''[exercise]
-name = "Hello World"
-order = 1
-difficulty = "beginner"
-
-[hints]
-enabled = true
-hints = [
-    "Start by defining a simple function",
-    "Return a string from the function"
-]
-''')
 
     (ex1_dir / "problem.md").write_text('''# Hello World
 
@@ -341,11 +326,42 @@ def hello():
 
 def test_hello():
     assert hello() == "Hello, World!"
+
+
+# ============================================================================
+# HINTS (scroll down if you're stuck)
+# ============================================================================
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
+# Hint 1: Start by defining a simple function
+#
+# Hint 2: Return a string from the function using: return "Hello, World!"
 ''')
 
     console.print(f"[green]Created new course at {course_path}[/green]")
-    console.print("  - exercises.toml")
+    console.print("  - exrun.toml")
     console.print("  - exercises/01_hello/")
+    console.print("    - problem.md")
+    console.print("    - src/")
+    console.print("    - tests/")
     console.print("\nRun [bold]exrun watch[/bold] to start!")
 
 

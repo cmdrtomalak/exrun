@@ -22,7 +22,7 @@ class ProgressDB:
             CREATE TABLE IF NOT EXISTS exercises (
                 id INTEGER PRIMARY KEY,
                 name TEXT NOT NULL UNIQUE,
-                order_num INTEGER NOT NULL,
+                order_num TEXT NOT NULL,
                 status TEXT DEFAULT 'pending',
                 attempts INTEGER DEFAULT 0,
                 first_passed_at TIMESTAMP,
@@ -37,13 +37,6 @@ class ProgressDB:
                 duration_ms INTEGER,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
-
-            CREATE TABLE IF NOT EXISTS hints_shown (
-                exercise_id INTEGER REFERENCES exercises(id),
-                hint_index INTEGER,
-                shown_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                PRIMARY KEY (exercise_id, hint_index)
-            );
         """)
         self.conn.commit()
 
@@ -56,9 +49,11 @@ class ProgressDB:
         if row:
             return row["id"]
 
+        # Store order as string representation (e.g., "1.2.3")
+        order_str = ".".join(str(o) for o in exercise.order)
         cursor = self.conn.execute(
             "INSERT INTO exercises (name, order_num) VALUES (?, ?)",
-            (exercise.name, exercise.order),
+            (exercise.name, order_str),
         )
         self.conn.commit()
         return cursor.lastrowid  # type: ignore[return-value]
@@ -88,7 +83,7 @@ class ProgressDB:
 
         self.conn.execute(
             """
-            UPDATE exercises 
+            UPDATE exercises
             SET attempts = attempts + 1, last_attempt_at = ?
             WHERE id = ?
             """,
@@ -98,7 +93,7 @@ class ProgressDB:
         if result.passed:
             self.conn.execute(
                 """
-                UPDATE exercises 
+                UPDATE exercises
                 SET status = 'passed', first_passed_at = COALESCE(first_passed_at, ?)
                 WHERE id = ?
                 """,
@@ -123,34 +118,9 @@ class ProgressDB:
         )
         self.conn.commit()
 
-    def get_hints_shown_count(self, exercise: Exercise) -> int:
-        """Get how many hints have been shown for an exercise."""
-        cursor = self.conn.execute(
-            """
-            SELECT COUNT(*) as count FROM hints_shown h
-            JOIN exercises e ON h.exercise_id = e.id
-            WHERE e.name = ?
-            """,
-            (exercise.name,),
-        )
-        return cursor.fetchone()["count"]
-
-    def record_hint_shown(self, exercise: Exercise, hint_index: int) -> None:
-        """Record that a hint was shown."""
-        exercise_id = self.ensure_exercise(exercise)
-        self.conn.execute(
-            """
-            INSERT OR IGNORE INTO hints_shown (exercise_id, hint_index)
-            VALUES (?, ?)
-            """,
-            (exercise_id, hint_index),
-        )
-        self.conn.commit()
-
     def reset_all(self) -> None:
         """Reset all progress."""
         self.conn.executescript("""
-            DELETE FROM hints_shown;
             DELETE FROM attempts;
             DELETE FROM exercises;
         """)
@@ -166,11 +136,10 @@ class ProgressDB:
             return
 
         exercise_id = row["id"]
-        self.conn.execute("DELETE FROM hints_shown WHERE exercise_id = ?", (exercise_id,))
         self.conn.execute("DELETE FROM attempts WHERE exercise_id = ?", (exercise_id,))
         self.conn.execute(
             """
-            UPDATE exercises 
+            UPDATE exercises
             SET status = 'pending', attempts = 0, first_passed_at = NULL, last_attempt_at = NULL
             WHERE id = ?
             """,

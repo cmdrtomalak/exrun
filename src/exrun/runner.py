@@ -13,9 +13,8 @@ from exrun.exercise import (
     discover_exercises,
     find_config_file,
     load_course_config,
-    load_project_config,
 )
-from exrun.models import Exercise, ExerciseStatus, TestResult
+from exrun.models import CourseConfig, Exercise, ExerciseStatus, TestResult
 from exrun.progress import ProgressDB
 
 
@@ -24,46 +23,55 @@ class ExerciseRunner:
 
     def __init__(self, console: Console | None = None):
         self.console = console or Console()
-        self._project_config = None
-        self._course_config = None
+        self._course_config: CourseConfig | None = None
         self._exercises: list[Exercise] = []
         self._progress_db: ProgressDB | None = None
 
     def initialize(self, exercises_path: Path | None = None) -> bool:
         """Initialize the runner by finding config and loading exercises."""
         if exercises_path:
-            self._project_config = type(
-                "ProjectConfig", (), {"exercises_path": exercises_path.resolve()}
-            )()
+            # Direct path provided - look for exrun.toml there
+            config_path = exercises_path / "exrun.toml"
+            if config_path.exists():
+                self._course_config = load_course_config(config_path)
+            else:
+                # Create a default config for the path
+                self._course_config = CourseConfig(
+                    name="Unnamed Course",
+                    exercises_path=exercises_path.resolve(),
+                )
         else:
             config_path = find_config_file()
             if config_path:
-                self._project_config = load_project_config(config_path)
+                self._course_config = load_course_config(config_path)
             else:
                 cwd = Path.cwd()
-                if (cwd / "exercises.toml").exists() or (cwd / "exercises").exists():
-                    self._project_config = type(
-                        "ProjectConfig", (), {"exercises_path": cwd}
-                    )()
+                # Check for exrun.toml or exercises directory
+                if (cwd / "exrun.toml").exists():
+                    self._course_config = load_course_config(cwd / "exrun.toml")
+                elif (cwd / "exercises").exists():
+                    self._course_config = CourseConfig(
+                        name="Unnamed Course",
+                        exercises_path=cwd / "exercises",
+                    )
                 else:
                     self.console.print(
-                        "[red]No .exrun.toml found and current directory is not an exercise course.[/red]"
+                        "[red]No exrun.toml found and current directory is not an exercise course.[/red]"
                     )
                     return False
 
-        exercises_path = self._project_config.exercises_path
+        exercises_path = self._course_config.exercises_path
         if not exercises_path.exists():
             self.console.print(f"[red]Exercises path not found: {exercises_path}[/red]")
             return False
 
-        self._course_config = load_course_config(exercises_path)
-        self._exercises = discover_exercises(exercises_path)
+        self._exercises = discover_exercises(exercises_path, self._course_config)
 
         if not self._exercises:
             self.console.print("[red]No exercises found.[/red]")
             return False
 
-        db_path = exercises_path / "progress.db"
+        db_path = exercises_path.parent / "progress.db"
         self._progress_db = ProgressDB(db_path)
 
         for ex in self._exercises:
@@ -76,7 +84,9 @@ class ExerciseRunner:
         return self._exercises
 
     @property
-    def course_config(self):
+    def course_config(self) -> CourseConfig:
+        if self._course_config is None:
+            raise RuntimeError("Runner not initialized")
         return self._course_config
 
     @property
@@ -98,7 +108,8 @@ class ExerciseRunner:
         for exercise in self._exercises:
             if exercise.name == name or exercise.path.name == name:
                 return exercise
-            if name.isdigit() and exercise.order == int(name):
+            # Check for order match (e.g., "1" or "1.2")
+            if name == exercise.order_str:
                 return exercise
         return None
 
@@ -141,33 +152,9 @@ class ExerciseRunner:
                         msg = failure.message[:200]
                         self.console.print(f"    [dim]{msg}[/dim]")
 
-            self._maybe_show_hint(exercise)
-
-    def _maybe_show_hint(self, exercise: Exercise) -> None:
-        """Show hint if enough attempts have been made."""
-        if not exercise.config.hints_enabled or not exercise.config.hints:
-            return
-
-        attempts = self.progress_db.get_attempts(exercise)
-        max_attempts = self._course_config.max_attempts_before_hint
-
-        if attempts >= max_attempts:
-            hints_shown = self.progress_db.get_hints_shown_count(exercise)
-            if hints_shown < len(exercise.config.hints):
-                hint = exercise.config.hints[hints_shown]
-                self.console.print(
-                    Panel(
-                        f"[yellow]{hint}[/yellow]",
-                        title="[yellow]💡 Hint[/yellow]",
-                        border_style="yellow",
-                    )
-                )
-                self.progress_db.record_hint_shown(exercise, hints_shown)
-
     def display_problem(self, exercise: Exercise) -> None:
         """Display the problem description."""
-        self.console.print(f"\n[bold cyan]Exercise: {exercise.name}[/bold cyan]")
-        self.console.print(f"[dim]Difficulty: {exercise.config.difficulty}[/dim]\n")
+        self.console.print(f"\n[bold cyan]Exercise: {exercise.name}[/bold cyan]\n")
 
         if exercise.problem_md:
             self.console.print(Markdown(exercise.problem_md))
@@ -196,7 +183,7 @@ class ExerciseRunner:
                 status_str = "[dim]○ Pending[/dim]"
 
             table.add_row(
-                str(exercise.order),
+                exercise.order_str,
                 exercise.name,
                 status_str,
                 str(attempts) if attempts > 0 else "-",

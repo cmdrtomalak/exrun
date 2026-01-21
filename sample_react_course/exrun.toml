@@ -3,7 +3,7 @@ name = "Learn React"
 version = "1.0.0"
 language = "react"
 test_runner = "vitest"
+exercises_path = "./exercises"
 
 [settings]
-show_hints = true
-max_attempts_before_hint = 3
+timeout_seconds = 60

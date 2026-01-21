@@ -1,0 +1,6 @@
+[course]
+name = "Learn HTML & CSS"
+version = "1.0.0"
+language = "html_css"
+test_runner = "playwright"
+exercises_path = "./exercises"

@@ -3,7 +3,4 @@ name = "Learn TypeScript"
 version = "1.0.0"
 language = "typescript"
 test_runner = "vitest"
-
-[settings]
-show_hints = true
-max_attempts_before_hint = 3
+exercises_path = "./exercises"

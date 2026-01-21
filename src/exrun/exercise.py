@@ -1,13 +1,14 @@
 """Exercise metadata parsing."""
 
+import re
 import tomllib
 from pathlib import Path
 
-from exrun.models import CourseConfig, Exercise, ExerciseConfig, ProjectConfig
+from exrun.models import CourseConfig, Exercise, ExerciseConfig
 
 
 def find_config_file(start_path: Path | None = None) -> Path | None:
-    """Find .exrun.toml by searching upward from start_path."""
+    """Find exrun.toml by searching upward from start_path."""
     if start_path is None:
         start_path = Path.cwd()
 
@@ -15,7 +16,7 @@ def find_config_file(start_path: Path | None = None) -> Path | None:
     home = Path.home()
 
     while current != current.parent:
-        config_path = current / ".exrun.toml"
+        config_path = current / "exrun.toml"
         if config_path.exists():
             return config_path
         if current == home:
@@ -29,15 +30,21 @@ def find_config_file(start_path: Path | None = None) -> Path | None:
     return None
 
 
-def load_project_config(config_path: Path) -> ProjectConfig:
-    """Load project configuration from .exrun.toml."""
+def load_course_config(config_path: Path) -> CourseConfig:
+    """Load course configuration from exrun.toml.
+
+    The exrun.toml only needs minimal configuration:
+    - exercises_path: path to directory containing exercises
+
+    Everything else is optional with sensible defaults.
+    """
     with open(config_path, "rb") as f:
         data = tomllib.load(f)
 
-    project = data.get("project", {})
-    defaults = data.get("defaults", {})
+    course = data.get("course", {})
+    settings = data.get("settings", {})
 
-    exercises_path_str = project.get("exercises_path", "./exercises")
+    exercises_path_str = course.get("exercises_path", "./exercises")
     if exercises_path_str.startswith(("http://", "https://", "git@")):
         raise NotImplementedError("Remote exercise fetching not yet supported")
 
@@ -45,74 +52,75 @@ def load_project_config(config_path: Path) -> ProjectConfig:
     if not exercises_path.is_absolute():
         exercises_path = config_path.parent / exercises_path
 
-    return ProjectConfig(
-        exercises_path=exercises_path.resolve(),
-        default_language=defaults.get("language", "python"),
-        default_test_runner=defaults.get("test_runner", "pytest"),
-    )
-
-
-def load_course_config(exercises_path: Path) -> CourseConfig:
-    """Load course configuration from exercises.toml."""
-    config_path = exercises_path / "exercises.toml"
-    if not config_path.exists():
-        return CourseConfig(name="Unnamed Course")
-
-    with open(config_path, "rb") as f:
-        data = tomllib.load(f)
-
-    course = data.get("course", {})
-    settings = data.get("settings", {})
-
     return CourseConfig(
         name=course.get("name", "Unnamed Course"),
+        exercises_path=exercises_path.resolve(),
         version=course.get("version", "1.0.0"),
         language=course.get("language", "python"),
         test_runner=course.get("test_runner", "pytest"),
-        show_hints=settings.get("show_hints", True),
-        max_attempts_before_hint=settings.get("max_attempts_before_hint", 3),
-    )
-
-
-def load_exercise_config(exercise_path: Path) -> ExerciseConfig:
-    """Load exercise configuration from exercise.toml."""
-    config_path = exercise_path / "exercise.toml"
-    if not config_path.exists():
-        return ExerciseConfig(
-            name=exercise_path.name,
-            order=_extract_order_from_name(exercise_path.name),
-        )
-
-    with open(config_path, "rb") as f:
-        data = tomllib.load(f)
-
-    exercise = data.get("exercise", {})
-    test = data.get("test", {})
-    hints = data.get("hints", {})
-
-    return ExerciseConfig(
-        name=exercise.get("name", exercise_path.name),
-        order=exercise.get("order", _extract_order_from_name(exercise_path.name)),
-        difficulty=exercise.get("difficulty", "beginner"),
-        test_command=test.get("command"),
-        timeout_seconds=test.get("timeout_seconds", 30),
-        hints=hints.get("hints", []),
-        hints_enabled=hints.get("enabled", True),
+        timeout_seconds=settings.get("timeout_seconds", 30),
     )
 
 
 def _extract_order_from_name(name: str) -> int:
-    """Extract order number from exercise directory name like '01_variables'."""
-    parts = name.split("_", 1)
-    if parts and parts[0].isdigit():
-        return int(parts[0])
+    """Extract order number from exercise directory name like '01_variables'.
+
+    Returns 999 if no numeric prefix found.
+    """
+    match = re.match(r"^(\d+)", name)
+    if match:
+        return int(match.group(1))
     return 999
 
 
-def load_exercise(exercise_path: Path) -> Exercise:
-    """Load a complete exercise from its directory."""
-    config = load_exercise_config(exercise_path)
+def _get_hierarchical_order(exercise_path: Path, exercises_root: Path) -> tuple[int, ...]:
+    """Get hierarchical order from path structure.
 
+    For example:
+    - exercises/01_basics/01_hello -> (1, 1)
+    - exercises/01_basics/02_world -> (1, 2)
+    - exercises/02_advanced/01_first -> (2, 1)
+    """
+    relative_path = exercise_path.relative_to(exercises_root)
+    parts = relative_path.parts
+    orders = tuple(_extract_order_from_name(part) for part in parts)
+    return orders
+
+
+def _format_exercise_name(dir_name: str) -> str:
+    """Convert directory name like '01_hello_world' to 'Hello World'."""
+    # Remove numeric prefix
+    name = re.sub(r"^\d+_", "", dir_name)
+    # Replace underscores with spaces and title case
+    return name.replace("_", " ").title()
+
+
+def load_exercise(
+    exercise_path: Path,
+    exercises_root: Path,
+    course_config: CourseConfig,
+) -> Exercise:
+    """Load a complete exercise from its directory.
+
+    Exercise metadata is derived from:
+    - Directory name for order and display name
+    - problem.md for description
+    - Course defaults for timeout, language, etc.
+    """
+    # Get hierarchical order from directory structure
+    order = _get_hierarchical_order(exercise_path, exercises_root)
+
+    # Name from directory
+    name = _format_exercise_name(exercise_path.name)
+
+    # Build config from directory info and course defaults
+    config = ExerciseConfig(
+        name=name,
+        order=order,
+        timeout_seconds=course_config.timeout_seconds,
+    )
+
+    # Load problem description
     problem_path = exercise_path / "problem.md"
     problem_md = ""
     if problem_path.exists():
@@ -125,20 +133,60 @@ def load_exercise(exercise_path: Path) -> Exercise:
     )
 
 
-def discover_exercises(exercises_path: Path) -> list[Exercise]:
-    """Discover all exercises in the exercises directory."""
-    exercises_dir = exercises_path / "exercises"
-    if not exercises_dir.exists():
-        exercises_dir = exercises_path
+def _is_exercise_dir(path: Path) -> bool:
+    """Check if a directory is an exercise (has src/ or tests/)."""
+    return path.is_dir() and (
+        (path / "src").exists() or (path / "tests").exists()
+    )
 
+
+def _discover_exercises_recursive(
+    current_path: Path,
+    exercises_root: Path,
+    course_config: CourseConfig,
+) -> list[Exercise]:
+    """Recursively discover exercises, supporting nested directories."""
     exercises: list[Exercise] = []
 
-    for entry in sorted(exercises_dir.iterdir()):
-        if entry.is_dir() and not entry.name.startswith((".", "_")):
-            if (entry / "exercise.toml").exists() or (entry / "src").exists():
-                exercises.append(load_exercise(entry))
+    # Get entries sorted by their numeric prefix
+    entries = sorted(
+        current_path.iterdir(),
+        key=lambda p: (_extract_order_from_name(p.name), p.name),
+    )
 
+    for entry in entries:
+        if not entry.is_dir():
+            continue
+        if entry.name.startswith((".", "_")):
+            continue
+        if entry.name == "node_modules":
+            continue
+
+        if _is_exercise_dir(entry):
+            # This is an exercise directory
+            exercises.append(load_exercise(entry, exercises_root, course_config))
+        else:
+            # Check for nested exercises
+            nested = _discover_exercises_recursive(entry, exercises_root, course_config)
+            exercises.extend(nested)
+
+    return exercises
+
+
+def discover_exercises(exercises_path: Path, course_config: CourseConfig) -> list[Exercise]:
+    """Discover all exercises in the exercises directory.
+
+    Exercises are discovered recursively and ordered by their directory names.
+    Directory names like '01_basics' and '02_advanced' determine order.
+    """
+    if not exercises_path.exists():
+        return []
+
+    exercises = _discover_exercises_recursive(exercises_path, exercises_path, course_config)
+
+    # Sort by hierarchical order
     exercises.sort(key=lambda e: e.order)
+
     return exercises
 
 

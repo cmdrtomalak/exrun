@@ -4,12 +4,12 @@ A Rustlings-style exercise runner that supports multiple programming languages w
 
 ## Features
 
-- **Language agnostic** - Python, JavaScript, TypeScript, HTML/CSS, PyTorch
+- **Language agnostic** - Python, JavaScript, TypeScript, HTML/CSS, PyTorch, React
 - **Sequential gating** - Exercises unlock only after previous ones pass
 - **Watch mode** - Rerun tests on file save (like Rustlings)
 - **Unified CLI** - Same commands regardless of language
 - **Progress tracking** - SQLite-based progress persistence
-- **Hint system** - Progressive hints after failed attempts
+- **Convention over configuration** - Minimal setup, order determined by directory names
 
 ## Installation
 
@@ -76,23 +76,46 @@ uv run exrun init --language python --name "My Course"
 
 ### Directory Structure
 
+Exercises are discovered automatically based on directory structure. Order is determined by numeric prefixes in directory names (e.g., `01_`, `02_`).
+
 ```
 my_course/
-├── exercises.toml           # Course metadata
-├── .exrun.toml              # Runner config (optional)
+├── exrun.toml               # Course configuration
 ├── exercises/
 │   ├── 01_intro/
-│   │   ├── exercise.toml    # Exercise config
-│   │   ├── problem.md       # Instructions
+│   │   ├── problem.md       # Instructions (optional)
 │   │   ├── src/
 │   │   │   └── main.py      # Student code (with TODOs)
 │   │   └── tests/
 │   │       └── test_main.py # Unit tests
-│   └── 02_next/
+│   ├── 02_variables/
+│   │   └── ...
+│   └── 03_functions/
 │       └── ...
 ```
 
-### exercises.toml
+### Nested Exercises
+
+You can organize exercises into sections using nested directories:
+
+```
+my_course/
+├── exrun.toml
+├── exercises/
+│   ├── 01_basics/
+│   │   ├── 01_hello/        # Order: 1.1
+│   │   │   ├── src/
+│   │   │   └── tests/
+│   │   └── 02_variables/    # Order: 1.2
+│   │       └── ...
+│   └── 02_advanced/
+│       ├── 01_functions/    # Order: 2.1
+│       └── 02_classes/      # Order: 2.2
+```
+
+### exrun.toml
+
+The only configuration file needed. All fields except `exercises_path` are optional:
 
 ```toml
 [course]
@@ -100,29 +123,39 @@ name = "Learn Python"
 version = "1.0.0"
 language = "python"
 test_runner = "pytest"
+exercises_path = "./exercises"
 
 [settings]
-show_hints = true
-max_attempts_before_hint = 3
+timeout_seconds = 30    # Optional: default test timeout
 ```
 
-### exercise.toml
+### Exercise Naming Convention
 
-```toml
-[exercise]
-name = "Variables"
-order = 1
-difficulty = "beginner"
+- Directory names determine order: `01_hello` runs before `02_world`
+- Display names are derived from directory names: `01_hello_world` → "Hello World"
+- An exercise directory must contain either `src/` or `tests/` to be recognized
 
-[test]
-timeout_seconds = 30
+### Adding Hints
 
-[hints]
-enabled = true
-hints = [
-    "First hint shown after 3 attempts",
-    "Second hint shown after more attempts"
-]
+Add hints as comments at the bottom of test files. Students can scroll down to see them:
+
+```python
+def test_hello():
+    assert hello() == "Hello, World!"
+
+
+# ============================================================================
+# HINTS (scroll down if you're stuck)
+# ============================================================================
+#
+#
+#
+#
+#
+#
+# Hint 1: Define a function using 'def hello():'
+#
+# Hint 2: Return a string using: return "Hello, World!"
 ```
 
 ## Supported Languages
@@ -135,6 +168,8 @@ hints = [
 | TypeScript | vitest + tsc             | `.ts`, `.tsx`       |
 | React      | vitest + testing-library | `.jsx`, `.tsx`      |
 | HTML/CSS   | Playwright               | `.html`, `.css`     |
+
+Language is auto-detected from file extensions if not specified in `exrun.toml`.
 
 ## Sample Courses
 
@@ -172,6 +207,20 @@ uv run exrun watch
 
 ```bash
 cd sample_typescript_course
+npm install  # First time only
+uv run exrun watch
+```
+
+### HTML/CSS Course (5 exercises)
+
+1. **HTML Basics** - Semantic HTML structure
+2. **CSS Fundamentals** - Selectors, colors, typography
+3. **Layout & Positioning** - Flexbox, Grid, positioning
+4. **Responsive Design** - Media queries, mobile-first
+5. **Interactive Components** - Transitions, animations, hover effects
+
+```bash
+cd sample_html_css_course
 npm install  # First time only
 uv run exrun watch
 ```
